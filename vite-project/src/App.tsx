@@ -1,34 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { FormEvent, useState } from "react"
+import { Todo } from "./types/todo"
+import TodoList from "./components/TodoList";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [newTodo, setNewTodo] = useState<string>("");
+
+  const addNewTodo = (e: FormEvent)=> {
+
+    e.preventDefault();
+
+    if (!newTodo.trim()) return;
+
+    const todo:Todo = {
+      id : Date.now(),
+      body : newTodo,
+      isComplete : false,
+    }
+
+    setTodos([...todos,todo]);
+    setNewTodo('');
+  }
+
+  const toggleComplete = (id: number)=>{
+    setTodos(todos.map(todo=>todo.id === id ? {...todo,isComplete:!todo.isComplete} : todo))
+  }
+
+  const deleteTodo = (id:number)=>{
+    setTodos(todos.filter(todo=>todo.id !== id))
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <main>
+      <h1>୨ৎTodo with React+Typescript୨ৎ</h1>
+      <form onSubmit={addNewTodo}>
+        <input type="text" value={newTodo} onChange={e=>setNewTodo(e.target.value)}/>
+        <button type="submit">Add To Do</button>
+      </form>
+      <TodoList todos={todos} toggleComplete={toggleComplete} deleteTodo={deleteTodo}/>
+    </main>
   )
 }
 
